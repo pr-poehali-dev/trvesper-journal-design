@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Icon from "@/components/ui/icon";
+import TradeReplay from "@/components/TradeReplay";
 
 interface Trade {
   id: number;
@@ -36,6 +37,7 @@ export default function Journal({ onNavigate }: JournalProps) {
   const [selectedYear, setSelectedYear] = useState(2026);
   const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [replayTrade, setReplayTrade] = useState<Trade | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<string | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
@@ -233,8 +235,14 @@ export default function Journal({ onNavigate }: JournalProps) {
                     {resultLabel(t.result)}
                   </span>
                 </div>
-                <div className="col-span-1 md:col-span-2">
+                <div className="col-span-1 md:col-span-2 flex items-center gap-2">
                   <span className="font-medium text-sm">{t.pair}</span>
+                  <button
+                    onClick={e => { e.stopPropagation(); setReplayTrade(t); }}
+                    className="md:hidden flex items-center gap-1 px-1.5 py-0.5 rounded border border-border text-xs text-muted-foreground hover:border-gold/50 hover:text-gold transition-all"
+                  >
+                    <Icon name="Play" size={10} />
+                  </button>
                 </div>
                 <div className="col-span-2 md:col-span-1 text-right md:text-left">
                   <span className={`text-xs font-medium px-2 py-0.5 rounded ${t.direction === "LONG" ? "bg-green-trade/10 text-green-trade" : "bg-red-trade/10 text-red-trade"}`}>
@@ -259,13 +267,24 @@ export default function Journal({ onNavigate }: JournalProps) {
                   <span className="text-sm text-muted-foreground">{new Date(t.date).toLocaleDateString("ru-RU")}</span>
                 </div>
                 <div className="col-span-1 hidden md:flex justify-end">
-                  <Icon name="ChevronRight" size={14} className="text-muted-foreground" />
+                  <button
+                    onClick={e => { e.stopPropagation(); setReplayTrade(t); }}
+                    className="flex items-center gap-1 px-2 py-1 rounded border border-border text-xs text-muted-foreground hover:border-gold/50 hover:text-gold transition-all"
+                  >
+                    <Icon name="Play" size={11} />
+                    Replay
+                  </button>
                 </div>
               </div>
             ))
           )}
         </div>
       </div>
+
+      {/* Trade Replay Modal */}
+      {replayTrade && (
+        <TradeReplay trade={replayTrade} onClose={() => setReplayTrade(null)} />
+      )}
 
       {/* Add Trade Modal */}
       {showAddModal && (
